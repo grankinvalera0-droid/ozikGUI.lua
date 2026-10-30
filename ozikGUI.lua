@@ -1,267 +1,424 @@
 
 --[[
-    ozikGUI v1.0
-    Black & Red Roblox Hub
-    UI and local testing prototype
+    ozikGUI v3.0
+    Universal Client Utility Hub
+    Black / Red Theme
 ]]
 
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Stats = game:GetService("Stats")
+local StarterGui = game:GetService("StarterGui")
 
 local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local GUI = Instance.new("ScreenGui")
-GUI.Name = "ozikGUI"
-GUI.ResetOnSpawn = false
+local old = PlayerGui:FindFirstChild("ozikGUI")
+if old then old:Destroy() end
 
-local success = pcall(function()
-    GUI.Parent = game:GetService("CoreGui")
-end)
+local Theme = {
+    BG = Color3.fromRGB(12,12,15),
+    Panel = Color3.fromRGB(23,23,28),
+    Red = Color3.fromRGB(215,25,45),
+    DarkRed = Color3.fromRGB(105,10,20),
+    White = Color3.fromRGB(245,245,245),
+    Grey = Color3.fromRGB(150,150,160),
+    Green = Color3.fromRGB(70,210,120)
+}
 
-if not success then
-    GUI.Parent = Player:WaitForChild("PlayerGui")
-end
-
-local Main = Instance.new("Frame")
-Main.Name = "Main"
-Main.Size = UDim2.fromOffset(620, 420)
-Main.Position = UDim2.new(0.5, -310, 0.5, -210)
-Main.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
-Main.BorderSizePixel = 0
-Main.Active = true
-Main.Draggable = true
-Main.Parent = GUI
-
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
-
-local Border = Instance.new("UIStroke", Main)
-Border.Color = Color3.fromRGB(210, 25, 40)
-Border.Thickness = 2
-
-local Header = Instance.new("TextLabel")
-Header.Size = UDim2.new(1, 0, 0, 52)
-Header.BackgroundColor3 = Color3.fromRGB(115, 15, 25)
-Header.Text = "🔥 ozikGUI"
-Header.TextColor3 = Color3.new(1, 1, 1)
-Header.Font = Enum.Font.GothamBold
-Header.TextSize = 24
-Header.Parent = Main
-
-local Sidebar = Instance.new("Frame")
-Sidebar.Position = UDim2.fromOffset(12, 65)
-Sidebar.Size = UDim2.new(0, 145, 1, -78)
-Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 29)
-Sidebar.Parent = Main
-
-Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 8)
-
-local SideLayout = Instance.new("UIListLayout")
-SideLayout.Padding = UDim.new(0, 6)
-SideLayout.Parent = Sidebar
-
-local Content = Instance.new("ScrollingFrame")
-Content.Position = UDim2.fromOffset(168, 65)
-Content.Size = UDim2.new(1, -180, 1, -78)
-Content.BackgroundColor3 = Color3.fromRGB(23, 23, 27)
-Content.BorderSizePixel = 0
-Content.ScrollBarThickness = 4
-Content.Parent = Main
-
-Instance.new("UICorner", Content).CornerRadius = UDim.new(0, 8)
-
-local ContentLayout = Instance.new("UIListLayout")
-ContentLayout.Padding = UDim.new(0, 8)
-ContentLayout.Parent = Content
-
-ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    Content.CanvasSize = UDim2.fromOffset(
-        0,
-        ContentLayout.AbsoluteContentSize.Y + 15
-    )
-end)
-
-local Search = Instance.new("TextBox")
-Search.Size = UDim2.new(1, -12, 0, 34)
-Search.Position = UDim2.fromOffset(6, 6)
-Search.BackgroundColor3 = Color3.fromRGB(40, 35, 38)
-Search.PlaceholderText = "Search functions..."
-Search.Text = ""
-Search.TextColor3 = Color3.new(1, 1, 1)
-Search.PlaceholderColor3 = Color3.fromRGB(160, 150, 150)
-Search.Font = Enum.Font.Gotham
-Search.TextSize = 13
-Search.Parent = Content
-
-Instance.new("UICorner", Search).CornerRadius = UDim.new(0, 6)
-
-local CurrentPage = ""
-local Buttons = {}
-
-local function ClearContent()
-    for _, object in ipairs(Content:GetChildren()) do
-        if object ~= ContentLayout and object ~= Search then
-            object:Destroy()
-        end
+local function New(class, props, parent)
+    local obj = Instance.new(class)
+    for k,v in pairs(props) do
+        obj[k] = v
     end
-    Buttons = {}
+    obj.Parent = parent
+    return obj
 end
 
-local function AddFeature(name, description)
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, -12, 0, 48)
-    Button.BackgroundColor3 = Color3.fromRGB(43, 34, 37)
-    Button.Text = ""
-    Button.Parent = Content
+local Screen = New("ScreenGui", {
+    Name = "ozikGUI",
+    ResetOnSpawn = false,
+    ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+}, PlayerGui)
 
-    Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 7)
+local Main = New("Frame", {
+    Size = UDim2.fromOffset(620,430),
+    Position = UDim2.new(.5,-310,.5,-215),
+    BackgroundColor3 = Theme.BG,
+    BorderSizePixel = 0
+}, Screen)
 
-    local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(1, -65, 0, 23)
-    Label.Position = UDim2.fromOffset(10, 3)
-    Label.BackgroundTransparency = 1
-    Label.Text = name
-    Label.TextColor3 = Color3.new(1, 1, 1)
-    Label.Font = Enum.Font.GothamBold
-    Label.TextSize = 13
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.Parent = Button
+New("UICorner",{CornerRadius=UDim.new(0,10)},Main)
+New("UIStroke",{Color=Theme.Red,Thickness=2},Main)
 
-    local Desc = Instance.new("TextLabel")
-    Desc.Size = UDim2.new(1, -65, 0, 17)
-    Desc.Position = UDim2.fromOffset(10, 25)
-    Desc.BackgroundTransparency = 1
-    Desc.Text = description or "Local interface option"
-    Desc.TextColor3 = Color3.fromRGB(160, 155, 155)
-    Desc.Font = Enum.Font.Gotham
-    Desc.TextSize = 10
-    Desc.TextXAlignment = Enum.TextXAlignment.Left
-    Desc.Parent = Button
+-- HEADER
 
-    local State = Instance.new("TextLabel")
-    State.Size = UDim2.fromOffset(42, 24)
-    State.Position = UDim2.new(1, -49, 0.5, -12)
-    State.BackgroundColor3 = Color3.fromRGB(90, 35, 40)
-    State.Text = "OFF"
-    State.TextColor3 = Color3.new(1, 1, 1)
-    State.Font = Enum.Font.GothamBold
-    State.TextSize = 10
-    State.Parent = Button
+local Header = New("Frame", {
+    Size = UDim2.new(1,0,0,45),
+    BackgroundColor3 = Theme.Panel,
+    BorderSizePixel = 0
+},Main)
 
-    Instance.new("UICorner", State).CornerRadius = UDim.new(0, 5)
+New("UICorner",{CornerRadius=UDim.new(0,10)},Header)
 
-    local active = false
+New("TextLabel",{
+    Size=UDim2.new(1,-100,1,0),
+    Position=UDim2.fromOffset(15,0),
+    BackgroundTransparency=1,
+    Text="ozikGUI  v3.0",
+    TextColor3=Theme.Red,
+    Font=Enum.Font.GothamBold,
+    TextSize=18,
+    TextXAlignment=Enum.TextXAlignment.Left
+},Header)
 
-    Button.MouseButton1Click:Connect(function()
-        active = not active
-        State.Text = active and "ON" or "OFF"
-        State.BackgroundColor3 = active
-            and Color3.fromRGB(185, 25, 40)
-            or Color3.fromRGB(90, 35, 40)
-    end)
+local Min = New("TextButton",{
+    Size=UDim2.fromOffset(35,30),
+    Position=UDim2.new(1,-43,0,7),
+    BackgroundColor3=Theme.DarkRed,
+    Text="-",
+    TextColor3=Theme.White,
+    Font=Enum.Font.GothamBold,
+    TextSize=22,
+    BorderSizePixel=0
+},Header)
 
-    table.insert(Buttons, {
-        frame = Button,
-        name = name
-    })
-end
+New("UICorner",{CornerRadius=UDim.new(0,6)},Min)
 
-local Pages = {
-    Movement = {
-        {"Fly", "Movement test placeholder"},
-        {"Speed", "Movement test placeholder"},
-        {"Jump Power", "Movement test placeholder"},
-        {"Infinite Jump", "Movement test placeholder"},
-        {"Noclip", "Movement test placeholder"}
+local Restore = New("TextButton",{
+    Size=UDim2.fromOffset(115,38),
+    Position=UDim2.fromOffset(15,15),
+    BackgroundColor3=Theme.BG,
+    Text="ozikGUI +",
+    TextColor3=Theme.Red,
+    Font=Enum.Font.GothamBold,
+    TextSize=14,
+    Visible=false,
+    BorderSizePixel=0
+},Screen)
+
+New("UICorner",{CornerRadius=UDim.new(0,8)},Restore)
+
+Min.MouseButton1Click:Connect(function()
+    Main.Visible=false
+    Restore.Visible=true
+end)
+
+Restore.MouseButton1Click:Connect(function()
+    Main.Visible=true
+    Restore.Visible=false
+end)
+
+-- DRAG
+
+local dragging=false
+local dragStart
+local startPos
+
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType==Enum.UserInputType.MouseButton1
+    or input.UserInputType==Enum.UserInputType.Touch then
+        dragging=true
+        dragStart=input.Position
+        startPos=Main.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (
+        input.UserInputType==Enum.UserInputType.MouseMovement
+        or input.UserInputType==Enum.UserInputType.Touch
+    ) then
+        local delta=input.Position-dragStart
+        Main.Position=UDim2.new(
+            startPos.X.Scale,startPos.X.Offset+delta.X,
+            startPos.Y.Scale,startPos.Y.Offset+delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType==Enum.UserInputType.MouseButton1
+    or input.UserInputType==Enum.UserInputType.Touch then
+        dragging=false
+    end
+end)
+
+-- SIDEBAR
+
+local Sidebar=New("Frame",{
+    Size=UDim2.new(0,145,1,-55),
+    Position=UDim2.fromOffset(0,50),
+    BackgroundColor3=Theme.Panel,
+    BorderSizePixel=0
+},Main)
+
+local Search=New("TextBox",{
+    Size=UDim2.new(1,-170,0,32),
+    Position=UDim2.fromOffset(160,52),
+    BackgroundColor3=Theme.Panel,
+    PlaceholderText="Search functions...",
+    Text="",
+    TextColor3=Theme.White,
+    PlaceholderColor3=Theme.Grey,
+    Font=Enum.Font.Gotham,
+    TextSize=13,
+    ClearTextOnFocus=false,
+    BorderSizePixel=0
+},Main)
+
+New("UICorner",{CornerRadius=UDim.new(0,6)},Search)
+
+local Area=New("ScrollingFrame",{
+    Size=UDim2.new(1,-160,1,-125),
+    Position=UDim2.fromOffset(155,95),
+    BackgroundTransparency=1,
+    BorderSizePixel=0,
+    ScrollBarThickness=4,
+    CanvasSize=UDim2.new()
+},Main)
+
+local AreaLayout=New("UIListLayout",{
+    Padding=UDim.new(0,7),
+    SortOrder=Enum.SortOrder.LayoutOrder
+},Area)
+
+AreaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    Area.CanvasSize=UDim2.fromOffset(0,AreaLayout.AbsoluteContentSize.Y+10)
+end)
+
+local Status=New("TextLabel",{
+    Size=UDim2.new(1,-160,0,22),
+    Position=UDim2.new(0,155,1,-27),
+    BackgroundTransparency=1,
+    Text="FPS: -- | Ping: --",
+    TextColor3=Theme.Grey,
+    Font=Enum.Font.Gotham,
+    TextSize=12,
+    TextXAlignment=Enum.TextXAlignment.Left
+},Main)
+
+-- STATE
+
+local State={
+    FPS=true,
+    Ping=true,
+    Stamina=true,
+    StaminaWarning=true,
+    Cooldown=false,
+    Notifications=true
+}
+
+local Pages={
+    Home={
+        "Welcome to ozikGUI",
+        "RightShift - hide/show menu",
+        "Universal utility client"
     },
-
-    Visuals = {
-        {"Player ESP", "Visual test placeholder"},
-        {"Name Tags", "Player labels"},
-        {"Distance ESP", "Distance display"},
-        {"Fullbright", "Lighting test"}
+    Player={
+        "Player Information",
+        "Character Information",
+        "Health Monitor"
     },
-
-    Player = {
-        {"Player Information", "Character information"},
-        {"Camera Settings", "Camera test"},
-        {"Character Information", "Character details"}
+    Visuals={
+        "FPS Monitor",
+        "Ping Monitor"
     },
-
-    Teleport = {
-        {"Save Position", "Position saving placeholder"},
-        {"Return Position", "Position return placeholder"}
+    Forsaken={
+        "Stamina Monitor",
+        "Stamina Warning",
+        "Block Cooldown Timer",
+        "Attack Warning (manual)",
+        "Attack Distance (manual)",
+        "Animation Detection (manual)",
+        "Auto Block (test project)",
+        "Auto Generator (test project)",
+        "Killer ESP (test project)"
     },
-
-    Forsaken = {
-        {"Auto Block UI", "Block testing interface only"},
-        {"Attack Warning", "Attack warning placeholder"},
-        {"Killer ESP", "Visual test placeholder"},
-        {"Attack Distance", "Distance display"},
-        {"Ping Monitor", "Network information"},
-        {"Block Cooldown", "Cooldown display"},
-        {"Animation Detection", "Animation test placeholder"}
-    },
-
-    Misc = {
-        {"Anti-AFK", "Placeholder"},
-        {"FPS Counter", "Performance display"},
-        {"Server Information", "Session information"}
-    },
-
-    Config = {
-        {"Save Settings", "Configuration placeholder"},
-        {"Compact Mode", "Interface option"}
+    Misc={
+        "Notification Test",
+        "Reset UI Position",
+        "Reset Settings"
     }
 }
 
-local function OpenPage(name)
-    CurrentPage = name
-    ClearContent()
+local currentPage="Home"
+local buttons={}
 
-    Search.Visible = true
-
-    for _, feature in ipairs(Pages[name]) do
-        AddFeature(feature[1], feature[2])
-    end
-end
-
-for name in pairs(Pages) do
-    local Tab = Instance.new("TextButton")
-    Tab.Size = UDim2.new(1, -10, 0, 38)
-    Tab.BackgroundColor3 = Color3.fromRGB(65, 25, 32)
-    Tab.Text = name
-    Tab.TextColor3 = Color3.new(1, 1, 1)
-    Tab.Font = Enum.Font.GothamBold
-    Tab.TextSize = 12
-    Tab.Parent = Sidebar
-
-    Instance.new("UICorner", Tab).CornerRadius = UDim.new(0, 6)
-
-    Tab.MouseButton1Click:Connect(function()
-        OpenPage(name)
+local function Notify(message)
+    if not State.Notifications then return end
+    pcall(function()
+        StarterGui:SetCore("SendNotification",{
+            Title="ozikGUI",
+            Text=message,
+            Duration=3
+        })
     end)
 end
 
+local function Clear()
+    for _,v in ipairs(Area:GetChildren()) do
+        if v:IsA("GuiObject") then v:Destroy() end
+    end
+    table.clear(buttons)
+end
+
+local function AddButton(name,callback)
+    local b=New("TextButton",{
+        Size=UDim2.new(1,-8,0,39),
+        BackgroundColor3=Theme.Panel,
+        Text=name,
+        TextColor3=Theme.White,
+        Font=Enum.Font.Gotham,
+        TextSize=13,
+        BorderSizePixel=0
+    },Area)
+
+    New("UICorner",{CornerRadius=UDim.new(0,6)},b)
+    b.MouseButton1Click:Connect(callback)
+    table.insert(buttons,b)
+    return b
+end
+
+local function Draw(page)
+    currentPage=page
+    Clear()
+
+    for _,name in ipairs(Pages[page] or {}) do
+        local b=AddButton(name,function()
+            if name=="Notification Test" then
+                Notify("ozikGUI is working!")
+            elseif name=="Reset UI Position" then
+                Main.Position=UDim2.new(.5,-310,.5,-215)
+                Notify("Position reset")
+            elseif name=="Reset Settings" then
+                for k in pairs(State) do
+                    State[k]=false
+                end
+                Notify("Settings reset")
+                Draw(currentPage)
+            elseif name=="Block Cooldown Timer" then
+                State.Cooldown=not State.Cooldown
+                Notify("Cooldown timer: "..tostring(State.Cooldown))
+                Draw(currentPage)
+            else
+                Notify(name.." is an informational/test feature")
+            end
+        end)
+
+        if State[name]~=nil then
+            b.Text=name.."  ["..(State[name] and "ON" or "OFF").."]"
+        end
+    end
+end
+
+local tabs={"Home","Player","Visuals","Forsaken","Misc"}
+
+for i,name in ipairs(tabs) do
+    local tab=New("TextButton",{
+        Size=UDim2.new(1,-12,0,36),
+        Position=UDim2.fromOffset(6,8+(i-1)*43),
+        BackgroundColor3=Theme.BG,
+        Text=name,
+        TextColor3=Theme.White,
+        Font=Enum.Font.GothamBold,
+        TextSize=13,
+        BorderSizePixel=0
+    },Sidebar)
+
+    New("UICorner",{CornerRadius=UDim.new(0,6)},tab)
+    tab.MouseButton1Click:Connect(function()
+        Draw(name)
+    end)
+end
+
+-- SEARCH
+
 Search:GetPropertyChangedSignal("Text"):Connect(function()
-    local query = string.lower(Search.Text)
-
-    for _, item in ipairs(Buttons) do
-        item.frame.Visible = string.find(
-            string.lower(item.name),
-            query,
-            1,
-            true
-        ) ~= nil
+    local q=string.lower(Search.Text)
+    for _,b in ipairs(buttons) do
+        b.Visible=(q=="") or string.find(
+            string.lower(b.Text),q,1,true)~=nil
     end
 end)
 
-UIS.InputBegan:Connect(function(input, processed)
-    if not processed and input.KeyCode == Enum.KeyCode.RightShift then
-        Main.Visible = not Main.Visible
+-- FPS / PING
+
+local frames=0
+local elapsed=0
+local fps=0
+
+RunService.RenderStepped:Connect(function(dt)
+    frames+=1
+    elapsed+=dt
+
+    if elapsed>=1 then
+        fps=frames
+        frames=0
+        elapsed=0
+
+        local ping="--"
+        pcall(function()
+            ping=tostring(math.floor(
+                Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+            )).." ms"
+        end)
+
+        local f=State.FPS and tostring(fps) or "OFF"
+        local p=State.Ping and ping or "OFF"
+
+        Status.Text="FPS: "..f.." | Ping: "..p
     end
 end)
 
-OpenPage("Movement")
+-- STAMINA MONITOR
+-- Reads a stamina value only if the game exposes it
+-- through the player's own attributes.
 
-print("ozikGUI loaded successfully!")
+local staminaLabel=New("TextLabel",{
+    Size=UDim2.new(1,-160,0,18),
+    Position=UDim2.new(0,155,1,-48),
+    BackgroundTransparency=1,
+    Text="Stamina: unavailable",
+    TextColor3=Theme.Grey,
+    Font=Enum.Font.Gotham,
+    TextSize=11,
+    TextXAlignment=Enum.TextXAlignment.Left
+},Main)
+
+RunService.Heartbeat:Connect(function()
+    if not State.Stamina then
+        staminaLabel.Text="Stamina Monitor: OFF"
+        return
+    end
+
+    local stamina=Player:GetAttribute("Stamina")
+
+    if typeof(stamina)=="number" then
+        staminaLabel.Text="Stamina: "..math.floor(stamina)
+        if State.StaminaWarning and stamina<=20 then
+            staminaLabel.TextColor3=Theme.Red
+        else
+            staminaLabel.TextColor3=Theme.Grey
+        end
+    else
+        staminaLabel.Text="Stamina: unavailable"
+        staminaLabel.TextColor3=Theme.Grey
+    end
+end)
+
+-- RIGHT SHIFT
+
+UserInputService.InputBegan:Connect(function(input,processed)
+    if processed then return end
+
+    if input.KeyCode==Enum.KeyCode.RightShift then
+        Main.Visible=not Main.Visible
+        Restore.Visible=not Main.Visible
+    end
+end)
+
+Draw("Home")
+Notify("ozikGUI v3.0 loaded")
+print("ozikGUI v3.0 loaded")
