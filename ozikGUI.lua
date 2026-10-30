@@ -1,15 +1,13 @@
 
 --[[
-    ozikGUI v3.0
-    Universal Client Utility Hub
-    Black / Red Theme
+    ozikGUI 4.0 - Ultimate Edition
+    Roblox Local Utility Hub
 ]]
 
 local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local Stats = game:GetService("Stats")
-local StarterGui = game:GetService("StarterGui")
 
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
@@ -19,45 +17,41 @@ if old then old:Destroy() end
 
 local Theme = {
     BG = Color3.fromRGB(12,12,15),
-    Panel = Color3.fromRGB(23,23,28),
-    Red = Color3.fromRGB(215,25,45),
-    DarkRed = Color3.fromRGB(105,10,20),
+    Panel = Color3.fromRGB(24,24,29),
+    Red = Color3.fromRGB(220,25,45),
     White = Color3.fromRGB(245,245,245),
     Grey = Color3.fromRGB(150,150,160),
-    Green = Color3.fromRGB(70,210,120)
+    Green = Color3.fromRGB(50,210,110)
 }
 
 local function New(class, props, parent)
     local obj = Instance.new(class)
-    for k,v in pairs(props) do
-        obj[k] = v
-    end
-    obj.Parent = parent
+    for k,v in pairs(props) do obj[k]=v end
+    obj.Parent=parent
     return obj
 end
 
-local Screen = New("ScreenGui", {
-    Name = "ozikGUI",
-    ResetOnSpawn = false,
-    ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-}, PlayerGui)
+local Screen=New("ScreenGui",{
+    Name="ozikGUI",
+    ResetOnSpawn=false
+},PlayerGui)
 
-local Main = New("Frame", {
-    Size = UDim2.fromOffset(620,430),
-    Position = UDim2.new(.5,-310,.5,-215),
-    BackgroundColor3 = Theme.BG,
-    BorderSizePixel = 0
-}, Screen)
+local Main=New("Frame",{
+    Size=UDim2.fromOffset(620,440),
+    Position=UDim2.new(.5,-310,.5,-220),
+    BackgroundColor3=Theme.BG,
+    BorderSizePixel=0
+},Screen)
 
 New("UICorner",{CornerRadius=UDim.new(0,10)},Main)
 New("UIStroke",{Color=Theme.Red,Thickness=2},Main)
 
 -- HEADER
 
-local Header = New("Frame", {
-    Size = UDim2.new(1,0,0,45),
-    BackgroundColor3 = Theme.Panel,
-    BorderSizePixel = 0
+local Header=New("Frame",{
+    Size=UDim2.new(1,0,0,45),
+    BackgroundColor3=Theme.Panel,
+    BorderSizePixel=0
 },Main)
 
 New("UICorner",{CornerRadius=UDim.new(0,10)},Header)
@@ -66,39 +60,34 @@ New("TextLabel",{
     Size=UDim2.new(1,-100,1,0),
     Position=UDim2.fromOffset(15,0),
     BackgroundTransparency=1,
-    Text="ozikGUI  v3.0",
+    Text="ozikGUI 4.0 | ULTIMATE",
     TextColor3=Theme.Red,
     Font=Enum.Font.GothamBold,
     TextSize=18,
     TextXAlignment=Enum.TextXAlignment.Left
 },Header)
 
-local Min = New("TextButton",{
+local Min=New("TextButton",{
     Size=UDim2.fromOffset(35,30),
     Position=UDim2.new(1,-43,0,7),
-    BackgroundColor3=Theme.DarkRed,
+    BackgroundColor3=Theme.Red,
     Text="-",
     TextColor3=Theme.White,
-    Font=Enum.Font.GothamBold,
     TextSize=22,
+    Font=Enum.Font.GothamBold,
     BorderSizePixel=0
 },Header)
 
-New("UICorner",{CornerRadius=UDim.new(0,6)},Min)
-
-local Restore = New("TextButton",{
+local Restore=New("TextButton",{
     Size=UDim2.fromOffset(115,38),
     Position=UDim2.fromOffset(15,15),
     BackgroundColor3=Theme.BG,
     Text="ozikGUI +",
     TextColor3=Theme.Red,
     Font=Enum.Font.GothamBold,
-    TextSize=14,
     Visible=false,
     BorderSizePixel=0
 },Screen)
-
-New("UICorner",{CornerRadius=UDim.new(0,8)},Restore)
 
 Min.MouseButton1Click:Connect(function()
     Main.Visible=false
@@ -113,34 +102,28 @@ end)
 -- DRAG
 
 local dragging=false
-local dragStart
-local startPos
+local dragStart,startPos
 
 Header.InputBegan:Connect(function(input)
-    if input.UserInputType==Enum.UserInputType.MouseButton1
-    or input.UserInputType==Enum.UserInputType.Touch then
+    if input.UserInputType==Enum.UserInputType.MouseButton1 then
         dragging=true
         dragStart=input.Position
         startPos=Main.Position
     end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (
-        input.UserInputType==Enum.UserInputType.MouseMovement
-        or input.UserInputType==Enum.UserInputType.Touch
-    ) then
-        local delta=input.Position-dragStart
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=input.Position-dragStart
         Main.Position=UDim2.new(
-            startPos.X.Scale,startPos.X.Offset+delta.X,
-            startPos.Y.Scale,startPos.Y.Offset+delta.Y
+            startPos.X.Scale,startPos.X.Offset+d.X,
+            startPos.Y.Scale,startPos.Y.Offset+d.Y
         )
     end
 end)
 
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType==Enum.UserInputType.MouseButton1
-    or input.UserInputType==Enum.UserInputType.Touch then
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType==Enum.UserInputType.MouseButton1 then
         dragging=false
     end
 end)
@@ -156,19 +139,16 @@ local Sidebar=New("Frame",{
 
 local Search=New("TextBox",{
     Size=UDim2.new(1,-170,0,32),
-    Position=UDim2.fromOffset(160,52),
+    Position=UDim2.fromOffset(155,52),
     BackgroundColor3=Theme.Panel,
-    PlaceholderText="Search functions...",
+    PlaceholderText="Search...",
     Text="",
     TextColor3=Theme.White,
-    PlaceholderColor3=Theme.Grey,
     Font=Enum.Font.Gotham,
     TextSize=13,
     ClearTextOnFocus=false,
     BorderSizePixel=0
 },Main)
-
-New("UICorner",{CornerRadius=UDim.new(0,6)},Search)
 
 local Area=New("ScrollingFrame",{
     Size=UDim2.new(1,-160,1,-125),
@@ -179,89 +159,77 @@ local Area=New("ScrollingFrame",{
     CanvasSize=UDim2.new()
 },Main)
 
-local AreaLayout=New("UIListLayout",{
+local Layout=New("UIListLayout",{
     Padding=UDim.new(0,7),
     SortOrder=Enum.SortOrder.LayoutOrder
 },Area)
 
-AreaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    Area.CanvasSize=UDim2.fromOffset(0,AreaLayout.AbsoluteContentSize.Y+10)
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    Area.CanvasSize=UDim2.fromOffset(0,Layout.AbsoluteContentSize.Y+10)
 end)
-
-local Status=New("TextLabel",{
-    Size=UDim2.new(1,-160,0,22),
-    Position=UDim2.new(0,155,1,-27),
-    BackgroundTransparency=1,
-    Text="FPS: -- | Ping: --",
-    TextColor3=Theme.Grey,
-    Font=Enum.Font.Gotham,
-    TextSize=12,
-    TextXAlignment=Enum.TextXAlignment.Left
-},Main)
 
 -- STATE
 
 local State={
+    Speed=false,
+    Jump=false,
+    Fly=false,
+    NoClip=false,
+    Highlight=false,
     FPS=true,
-    Ping=true,
-    Stamina=true,
-    StaminaWarning=true,
-    Cooldown=false,
-    Notifications=true
+    Ping=true
 }
 
 local Pages={
     Home={
-        "Welcome to ozikGUI",
-        "RightShift - hide/show menu",
-        "Universal utility client"
+        "Welcome to ozikGUI 4.0",
+        "RightShift - Hide / Show",
+        "Ultimate Edition"
     },
-    Player={
-        "Player Information",
-        "Character Information",
-        "Health Monitor"
+    Movement={
+        "Fly",
+        "Speed",
+        "Jump",
+        "NoClip"
     },
     Visuals={
+        "Highlight",
         "FPS Monitor",
         "Ping Monitor"
     },
+    Player={
+        "Health Monitor",
+        "Stamina Monitor"
+    },
     Forsaken={
-        "Stamina Monitor",
-        "Stamina Warning",
-        "Block Cooldown Timer",
-        "Attack Warning (manual)",
-        "Attack Distance (manual)",
-        "Animation Detection (manual)",
+        "Attack Warning (test)",
+        "Block Cooldown (test)",
         "Auto Block (test project)",
         "Auto Generator (test project)",
-        "Killer ESP (test project)"
+        "Stamina Monitor"
     },
-    Misc={
-        "Notification Test",
-        "Reset UI Position",
+    Settings={
+        "Reset Position",
         "Reset Settings"
     }
 }
 
-local currentPage="Home"
 local buttons={}
-
-local function Notify(message)
-    if not State.Notifications then return end
-    pcall(function()
-        StarterGui:SetCore("SendNotification",{
-            Title="ozikGUI",
-            Text=message,
-            Duration=3
-        })
-    end)
-end
 
 local function Clear()
     for _,v in ipairs(Area:GetChildren()) do
         if v:IsA("GuiObject") then v:Destroy() end
     end
     table.clear(buttons)
+end
+
+local function Character()
+    return Player.Character
+end
+
+local function Toggle(name)
+    State[name]=not State[name]
+    return State[name]
 end
 
 local function AddButton(name,callback)
@@ -281,39 +249,93 @@ local function AddButton(name,callback)
     return b
 end
 
-local function Draw(page)
-    currentPage=page
-    Clear()
+-- SAFE LOCAL VISUALS
 
-    for _,name in ipairs(Pages[page] or {}) do
-        local b=AddButton(name,function()
-            if name=="Notification Test" then
-                Notify("ozikGUI is working!")
-            elseif name=="Reset UI Position" then
-                Main.Position=UDim2.new(.5,-310,.5,-215)
-                Notify("Position reset")
-            elseif name=="Reset Settings" then
-                for k in pairs(State) do
-                    State[k]=false
-                end
-                Notify("Settings reset")
-                Draw(currentPage)
-            elseif name=="Block Cooldown Timer" then
-                State.Cooldown=not State.Cooldown
-                Notify("Cooldown timer: "..tostring(State.Cooldown))
-                Draw(currentPage)
-            else
-                Notify(name.." is an informational/test feature")
+local function SetHighlight(enabled)
+    for _,p in ipairs(Players:GetPlayers()) do
+        if p~=Player and p.Character then
+            local h=p.Character:FindFirstChild("ozikHighlight")
+            if enabled and not h then
+                h=Instance.new("Highlight")
+                h.Name="ozikHighlight"
+                h.FillColor=Theme.Red
+                h.OutlineColor=Theme.White
+                h.Parent=p.Character
+            elseif not enabled and h then
+                h:Destroy()
             end
-        end)
-
-        if State[name]~=nil then
-            b.Text=name.."  ["..(State[name] and "ON" or "OFF").."]"
         end
     end
 end
 
-local tabs={"Home","Player","Visuals","Forsaken","Misc"}
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function()
+        task.wait(1)
+        if State.Highlight then SetHighlight(true) end
+    end)
+end)
+
+local function Draw(page)
+    Clear()
+
+    for _,name in ipairs(Pages[page] or {}) do
+        local b=AddButton(name,function()
+            if name=="Reset Position" then
+                Main.Position=UDim2.new(.5,-310,.5,-220)
+
+            elseif name=="Reset Settings" then
+                for k in pairs(State) do State[k]=false end
+                Draw(page)
+
+            elseif name=="Highlight" then
+                local enabled=Toggle("Highlight")
+                SetHighlight(enabled)
+                b.Text=name.." ["..(enabled and "ON" or "OFF").."]"
+
+            elseif name=="Speed" or name=="Jump" then
+                local enabled=Toggle(name)
+                b.Text=name.." ["..(enabled and "ON" or "OFF").."]"
+                local char=Character()
+                local hum=char and char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    if name=="Speed" then
+                        hum.WalkSpeed=enabled and 24 or 16
+                    else
+                        hum.UseJumpPower=true
+                        hum.JumpPower=enabled and 70 or 50
+                    end
+                end
+
+            elseif name=="Fly" or name=="NoClip" then
+                local enabled=Toggle(name)
+                b.Text=name.." ["..(enabled and "ON" or "OFF").."]"
+                -- These controls are intentionally limited to UI state.
+                -- Implement movement physics in your own Studio test project.
+
+            elseif name=="FPS Monitor" then
+                State.FPS=not State.FPS
+                b.Text=name.." ["..(State.FPS and "ON" or "OFF").."]"
+
+            elseif name=="Ping Monitor" then
+                State.Ping=not State.Ping
+                b.Text=name.." ["..(State.Ping and "ON" or "OFF").."]"
+
+            else
+                pcall(function()
+                    game:GetService("StarterGui"):SetCore(
+                        "SendNotification",{
+                            Title="ozikGUI 4.0",
+                            Text=name.." selected",
+                            Duration=3
+                        }
+                    )
+                end)
+            end
+        end)
+    end
+end
+
+local tabs={"Home","Movement","Visuals","Player","Forsaken","Settings"}
 
 for i,name in ipairs(tabs) do
     local tab=New("TextButton",{
@@ -338,81 +360,50 @@ end
 Search:GetPropertyChangedSignal("Text"):Connect(function()
     local q=string.lower(Search.Text)
     for _,b in ipairs(buttons) do
-        b.Visible=(q=="") or string.find(
+        b.Visible=q=="" or string.find(
             string.lower(b.Text),q,1,true)~=nil
     end
 end)
 
 -- FPS / PING
 
-local frames=0
-local elapsed=0
-local fps=0
+local Status=New("TextLabel",{
+    Size=UDim2.new(1,-160,0,22),
+    Position=UDim2.new(0,155,1,-27),
+    BackgroundTransparency=1,
+    Text="FPS: -- | Ping: --",
+    TextColor3=Theme.Grey,
+    Font=Enum.Font.Gotham,
+    TextSize=12,
+    TextXAlignment=Enum.TextXAlignment.Left
+},Main)
 
+local frames,elapsed=0,0
 RunService.RenderStepped:Connect(function(dt)
     frames+=1
     elapsed+=dt
 
     if elapsed>=1 then
-        fps=frames
+        local fps=frames
         frames=0
         elapsed=0
 
         local ping="--"
         pcall(function()
-            ping=tostring(math.floor(
+            ping=math.floor(
                 Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
-            )).." ms"
+            ).." ms"
         end)
 
-        local f=State.FPS and tostring(fps) or "OFF"
-        local p=State.Ping and ping or "OFF"
-
-        Status.Text="FPS: "..f.." | Ping: "..p
-    end
-end)
-
--- STAMINA MONITOR
--- Reads a stamina value only if the game exposes it
--- through the player's own attributes.
-
-local staminaLabel=New("TextLabel",{
-    Size=UDim2.new(1,-160,0,18),
-    Position=UDim2.new(0,155,1,-48),
-    BackgroundTransparency=1,
-    Text="Stamina: unavailable",
-    TextColor3=Theme.Grey,
-    Font=Enum.Font.Gotham,
-    TextSize=11,
-    TextXAlignment=Enum.TextXAlignment.Left
-},Main)
-
-RunService.Heartbeat:Connect(function()
-    if not State.Stamina then
-        staminaLabel.Text="Stamina Monitor: OFF"
-        return
-    end
-
-    local stamina=Player:GetAttribute("Stamina")
-
-    if typeof(stamina)=="number" then
-        staminaLabel.Text="Stamina: "..math.floor(stamina)
-        if State.StaminaWarning and stamina<=20 then
-            staminaLabel.TextColor3=Theme.Red
-        else
-            staminaLabel.TextColor3=Theme.Grey
-        end
-    else
-        staminaLabel.Text="Stamina: unavailable"
-        staminaLabel.TextColor3=Theme.Grey
+        Status.Text="FPS: "..(State.FPS and fps or "OFF")
+            .." | Ping: "..(State.Ping and ping or "OFF")
     end
 end)
 
 -- RIGHT SHIFT
 
-UserInputService.InputBegan:Connect(function(input,processed)
+UIS.InputBegan:Connect(function(input,processed)
     if processed then return end
-
     if input.KeyCode==Enum.KeyCode.RightShift then
         Main.Visible=not Main.Visible
         Restore.Visible=not Main.Visible
@@ -420,5 +411,4 @@ UserInputService.InputBegan:Connect(function(input,processed)
 end)
 
 Draw("Home")
-Notify("ozikGUI v3.0 loaded")
-print("ozikGUI v3.0 loaded")
+print("ozikGUI 4.0 loaded")
